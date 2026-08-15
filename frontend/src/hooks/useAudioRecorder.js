@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import { float32ToInt16 } from "../utils/audioProcessor";
+// import { float32ToInt16 } from "../utils/audioProcessor";
 
 function useAudioRecorder() {
   const [isRecording, setIsRecording] = useState(false);
@@ -7,7 +7,8 @@ function useAudioRecorder() {
 
   const streamRef = useRef(null);
   const audioContextRef = useRef(null);
-  const processorRef = useRef(null);
+  // const processorRef = useRef(null);
+  const workletNodeRef = useRef(null);
   const sourceRef = useRef(null);
 
   const startRecording = useCallback(async () => {
@@ -31,42 +32,37 @@ function useAudioRecorder() {
       const source = audioContext.createMediaStreamSource(stream);
       sourceRef.current = source;
 
-      const processor = audioContext.createScriptProcessor(
-        4096,
-        1,
-        1
-      );
+      await audioContext.audioWorklet.addModule("/audio-processor.js");
 
-      processorRef.current = processor;
+      const workletNode = new AudioWorkletNode(audioContext, "audio-processor");
 
-      processor.onaudioprocess = (event) => {
-        const inputData = event.inputBuffer.getChannelData(0);
+      workletNodeRef.current = workletNode;
 
-        const pcmData = float32ToInt16(inputData);
+      workletNode.port.onmessage = (event) => {
+        const pcmData = event.data;
 
-        console.log("Audio chunk:", {
+        console.log("PCM chunk:", {
           samples: pcmData.length,
-          sampleRate: audioContext.sampleRate,
+          sampleRate: 16000,
+          byteLength: pcmData.byteLength,
         });
       };
 
-      source.connect(processor);
-      processor.connect(audioContext.destination);
+      source.connect(workletNode);
+      workletNode.connect(audioContext.destination);
 
       setIsRecording(true);
     } catch (err) {
       console.error("Microphone error:", err);
 
-      setError(
-        "Microphone access was denied or unavailable."
-      );
+      setError("Microphone access was denied or unavailable.");
     }
   }, []);
 
   const stopRecording = useCallback(() => {
-    if (processorRef.current) {
-      processorRef.current.disconnect();
-      processorRef.current = null;
+    if (workletNodeRef.current) {
+      workletNodeRef.current.disconnect();
+      workletNodeRef.current = null;
     }
 
     if (sourceRef.current) {
