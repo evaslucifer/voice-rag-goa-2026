@@ -8,6 +8,20 @@ import Waveform from "./components/Waveform";
 import TranscriptPanel from "./components/TranscriptPanel";
 import AnswerPanel from "./components/AnswerPanel";
 import LatencyPanel from "./components/LatencyPanel";
+const mockCitations = [
+  {
+    id: "source-1",
+    title: "MSMARCO-XI Document 1",
+    text: "This document contains information related to the user's query.",
+    score: 0.94,
+  },
+  {
+    id: "source-2",
+    title: "MSMARCO-XI Document 2",
+    text: "This source provides additional context for the generated answer.",
+    score: 0.87,
+  },
+];
 
 function App() {
   const { recordingState, error, audioLevel, startRecording, stopRecording } =
@@ -58,7 +72,10 @@ function App() {
         <section className="content-grid">
           <TranscriptPanel />
 
-          <AnswerPanel />
+          <AnswerPanel
+            answer="This is a grounded answer generated from the retrieved corpus."
+            citations={mockCitations}
+          />
         </section>
 
         <LatencyPanel />
