@@ -10,7 +10,7 @@ import AnswerPanel from "./components/AnswerPanel";
 import LatencyPanel from "./components/LatencyPanel";
 
 function App() {
-  const { isRecording, error, startRecording, stopRecording } =
+  const { isRecording, error,audioLevel, startRecording, stopRecording } =
     useAudioRecorder();
 
   const handleMicClick = () => {
@@ -39,7 +39,7 @@ function App() {
           <MicButton isRecording={isRecording} onClick={handleMicClick} />
           {error && <p className="mic-error">{error}</p>}
 
-          <Waveform />
+          <Waveform audioLevel={audioLevel} />
         </section>
 
         <section className="content-grid">
