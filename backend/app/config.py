@@ -26,37 +26,36 @@ class Settings(BaseSettings):
     CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://127.0.0.1:3000", "*"]
     FRONTEND_ORIGIN: Optional[str] = Field(default=None, description="Deployed frontend URL (e.g. https://my-frontend.vercel.app)")
 
-    # External API Keys
+    
     SARVAM_API_KEY: Optional[str] = Field(default=None, description="Sarvam AI API key for STT")
     GROQ_API_KEY: Optional[str] = Field(default=None, description="Groq API key for Llama 3.1 LLM inference")
     GEMINI_API_KEY: Optional[str] = Field(default=None, description="Gemini API key for fallback inference")
 
-    # Qdrant Vector Database
+    
     QDRANT_URL: Optional[str] = Field(default=None, description="Optional Qdrant server instance URL")
     QDRANT_PATH: str = Field(default="./qdrant_storage", description="Local embedded Qdrant storage path")
     QDRANT_API_KEY: Optional[str] = Field(default=None, description="Optional Qdrant Cloud API key")
     QDRANT_COLLECTION: str = Field(default="msmarco_demo", description="Qdrant target collection name (default: msmarco_demo in demo mode)")
     QDRANT_TIMEOUT_SECONDS: float = Field(default=5.0, description="Qdrant client timeout in seconds")
 
-    # Embedding Service Configuration (Local FastEmbed ONNX)
+     
     EMBEDDING_MODEL_NAME: str = Field(
         default="BAAI/bge-small-en-v1.5",
         description="FastEmbed model name for query embedding"
     )
     EMBEDDING_BATCH_SIZE: int = Field(default=32, description="Batch size for embedding generation")
 
-    # Retrieval Configuration (Target Top-K=3, Score Threshold=0.65)
+     
     RETRIEVAL_TOP_K: int = Field(default=3, description="Number of top candidates to retrieve")
     RETRIEVAL_SCORE_THRESHOLD: float = Field(default=0.65, description="Minimum cosine similarity threshold")
-
-    # Chunking Configuration
+ 
     CHUNKING_STRATEGY: str = Field(default="semantic", description="Default chunking strategy: semantic, parent_child, metadata, or fixed")
     CHUNK_SIZE: int = Field(default=200, description="Fixed chunk size in words")
     CHUNK_OVERLAP: int = Field(default=40, description="Fixed chunk overlap in words")
     PARENT_CHUNK_SIZE: int = Field(default=512, description="Parent chunk size in words for parent-child strategy")
     CHILD_CHUNK_SIZE: int = Field(default=128, description="Child chunk size in words for parent-child strategy")
 
-    # LLM Service Configuration
+     
     LLM_PROVIDER: str = Field(default="groq", description="LLM provider: groq, gemini, or local")
     LLM_MODEL: str = Field(default="llama-3.1-8b-instant", description="Primary LLM model identifier")
     LLM_FALLBACK_MODEL: str = Field(default="gemini-1.5-flash", description="Fallback LLM model identifier")
