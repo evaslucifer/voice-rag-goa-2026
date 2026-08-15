@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from "react";
 // import { float32ToInt16 } from "../utils/audioProcessor";
 
 function useAudioRecorder() {
-  const [isRecording, setIsRecording] = useState(false);
+  const [recordingState, setRecordingState] = useState("idle");
   const [error, setError] = useState(null);
 
   const streamRef = useRef(null);
@@ -88,11 +88,12 @@ function useAudioRecorder() {
       source.connect(workletNode);
       workletNode.connect(audioContext.destination);
 
-      setIsRecording(true);
+      setRecordingState("recording");
     } catch (err) {
       console.error("Microphone error:", err);
 
       setError("Microphone access was denied or unavailable.");
+      setRecordingState("error");
     }
   }, []);
 
@@ -131,12 +132,14 @@ function useAudioRecorder() {
     }
 
     setAudioLevel(0);
+    // change when backen will be integrated
+    // setRecordingState("processing");
 
-    setIsRecording(false);
+    setRecordingState("idle");
   }, []);
 
   return {
-    isRecording,
+    recordingState,
     error,
     audioLevel,
     startRecording,

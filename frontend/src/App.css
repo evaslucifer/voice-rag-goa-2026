@@ -281,3 +281,9 @@ button {
   color: #ff7b7b;
   font-size: 13px;
 }
+.recording-status {
+  min-height: 20px;
+  margin: 14px 0 32px;
+  color: #7f8b9d;
+  font-size: 13px;
+}

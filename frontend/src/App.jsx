@@ -10,13 +10,14 @@ import AnswerPanel from "./components/AnswerPanel";
 import LatencyPanel from "./components/LatencyPanel";
 
 function App() {
-  const { isRecording, error,audioLevel, startRecording, stopRecording } =
+  const { recordingState, error, audioLevel, startRecording, stopRecording } =
     useAudioRecorder();
 
   const handleMicClick = () => {
-    if (isRecording) {
+    console.log("Mic clicked:", recordingState);
+    if (recordingState === "recording") {
       stopRecording();
-    } else {
+    } else if (recordingState === "idle" || recordingState === "error") {
       startRecording();
     }
   };
@@ -36,10 +37,22 @@ function App() {
           <p className="hero-description">
             Speak naturally and get a grounded answer from MSMARCO-XI.
           </p>
-          <MicButton isRecording={isRecording} onClick={handleMicClick} />
+          <MicButton
+            isRecording={recordingState === "recording"}
+            onClick={handleMicClick}
+          />
+          <p className="recording-status">
+            {recordingState === "idle" && "Click the microphone to start"}
+            {recordingState === "recording" && "Listening..."}
+            {recordingState === "processing" && "Processing your question..."}
+            {recordingState === "error" && "Microphone unavailable"}
+          </p>
+
           {error && <p className="mic-error">{error}</p>}
 
-          <Waveform audioLevel={audioLevel} />
+          <Waveform
+            audioLevel={recordingState === "recording" ? audioLevel : 0}
+          />
         </section>
 
         <section className="content-grid">
