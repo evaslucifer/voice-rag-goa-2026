@@ -271,3 +271,8 @@ button {
     gap: 10px;
   }
 }
+.mic-button.recording {
+  transform: scale(1.08);
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.12);
+}
