@@ -276,3 +276,8 @@ button {
   border-color: rgba(255, 255, 255, 0.4);
   background: rgba(255, 255, 255, 0.12);
 }
+.mic-error {
+  margin: 10px 0 0;
+  color: #ff7b7b;
+  font-size: 13px;
+}
