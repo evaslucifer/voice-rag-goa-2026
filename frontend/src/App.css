@@ -287,3 +287,91 @@ button {
   color: #7f8b9d;
   font-size: 13px;
 }
+.answer-text {
+  margin: 0;
+  color: #c8d0dc;
+  line-height: 1.7;
+}
+
+.citations {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.citations-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.citations-header h4 {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8d99aa;
+}
+
+.citations-header span {
+  font-size: 11px;
+  color: #687486;
+}
+
+.citation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.citation-card {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.citation-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 26px;
+  width: 26px;
+  height: 26px;
+
+  border-radius: 7px;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  font-size: 11px;
+  color: #b9c2d0;
+}
+
+.citation-content {
+  min-width: 0;
+}
+
+.citation-content h5 {
+  margin: 0 0 5px;
+  font-size: 13px;
+  color: #dce2ea;
+}
+
+.citation-content p {
+  margin: 0 0 8px;
+
+  color: #7f8b9d;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.citation-score {
+  font-size: 10px;
+  color: #687486;
+}
