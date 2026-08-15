@@ -3,8 +3,17 @@ __pycache__/
 *.py[codz]
 *$py.class
 
-# C extensions
-*.so
+# Environments & Secrets
+.env
+.env.*
+!.env.example
+*.env
+.venv/
+env/
+venv/
+qdrant_storage/
+backend/qdrant_storage/
+backend/benchmarks/results/
 
 # Distribution / packaging
 .Python
@@ -141,27 +150,6 @@ mnesia/
 rabbitmq/
 rabbitmq-data/
 
-# ActiveMQ
-activemq-data/
-
-# SageMath parsed files
-*.sage.py
-
-# Environments
-.env
-.envrc
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
 .ropeproject
 
 # mkdocs documentation
@@ -216,3 +204,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Generated benchmark results
+backend/benchmarks/results/
