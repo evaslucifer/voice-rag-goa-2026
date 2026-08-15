@@ -1,122 +1,110 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
+    <div className="app">
+      <header className="header">
         <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
+          <p className="eyebrow">HH GOA 2026</p>
+          <h1>Voice RAG</h1>
+        </div>
+
+        <div className="connection-status">
+          <span className="status-dot"></span>
+          <span>Connected</span>
+        </div>
+      </header>
+
+      <main className="main-content">
+        <section className="hero">
+          <p className="section-label">VOICE ASSISTANT</p>
+
+          <h2>Ask anything about the corpus</h2>
+
+          <p className="hero-description">
+            Speak naturally and get a grounded answer from MSMARCO-XI.
           </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
+          <button className="mic-button" aria-label="Start recording">
+            🎙️
+          </button>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+          <p className="mic-label">Click to start speaking</p>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+          <div className="waveform">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </section>
+
+        <section className="content-grid">
+          <div className="panel">
+            <div className="panel-header">
+              <h3>Transcript</h3>
+              <span className="panel-status">LIVE</span>
+            </div>
+
+            <p className="placeholder">
+              Your speech transcript will appear here...
+            </p>
+          </div>
+
+          <div className="panel">
+            <div className="panel-header">
+              <h3>Answer</h3>
+              <span className="panel-status">GROUNDED</span>
+            </div>
+
+            <p className="placeholder">
+              Your grounded answer will appear here...
+            </p>
+          </div>
+        </section>
+
+        <section className="panel latency-panel">
+          <div className="panel-header">
+            <h3>Latency</h3>
+            <span className="latency-total">Total — ms</span>
+          </div>
+
+          <div className="latency-list">
+            <LatencyRow label="STT" />
+            <LatencyRow label="Embedding" />
+            <LatencyRow label="Qdrant" />
+            <LatencyRow label="Guardrail" />
+            <LatencyRow label="LLM TTFT" />
+          </div>
+        </section>
+      </main>
+    </div>
+  );
 }
 
-export default App
+function LatencyRow({ label }) {
+  return (
+    <div className="latency-row">
+      <span>{label}</span>
+
+      <div className="latency-bar-container">
+        <div className="latency-bar"></div>
+      </div>
+
+      <span>— ms</span>
+    </div>
+  );
+}
+
+export default App;
