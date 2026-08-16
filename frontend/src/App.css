@@ -249,37 +249,155 @@ button {
   background: #7f8b9d;
   transition: width 0.4s ease;
 }
-
 @media (max-width: 700px) {
   .header {
+    width: min(100% - 24px, 1200px);
     padding: 20px 0;
   }
 
+  .header h1 {
+    font-size: 20px;
+  }
+
+  .connection-status {
+    padding: 7px 10px;
+    font-size: 11px;
+  }
+
   .main-content {
-    padding-top: 32px;
+    width: min(100% - 24px, 1200px);
+    padding: 32px 0 48px;
   }
 
   .hero {
-    padding: 36px 8px 48px;
+    padding: 36px 4px 48px;
+  }
+
+  .hero h2 {
+    font-size: clamp(28px, 9vw, 40px);
+  }
+
+  .hero-description {
+    margin: 16px auto 28px;
+    font-size: 14px;
+  }
+
+  .mic-button {
+    width: 76px;
+    height: 76px;
+    font-size: 28px;
   }
 
   .content-grid {
     grid-template-columns: 1fr;
   }
 
-  .latency-row {
-    grid-template-columns: 80px 1fr 60px;
-    gap: 10px;
+  .panel {
+    padding: 18px;
+    border-radius: 16px;
   }
+
+  .latency-row {
+    grid-template-columns: 75px minmax(0, 1fr) 62px;
+    gap: 8px;
+    font-size: 12px;
+  }
+
   .benchmark-summary {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .benchmark-stat {
+    padding: 12px;
+  }
+
+  .benchmark-stat strong {
+    font-size: 16px;
+  }
+
+  .benchmark-table {
+    overflow-x: auto;
   }
 
   .benchmark-row {
-    grid-template-columns: 1.3fr repeat(4, minmax(55px, 1fr));
-    gap: 6px;
-
+    min-width: 500px;
+    grid-template-columns: 1.5fr repeat(4, 1fr);
+    gap: 8px;
     font-size: 10px;
+  }
+
+  .citation-card {
+    padding: 10px;
+  }
+
+  .citation-content h5 {
+    font-size: 12px;
+  }
+
+  .citation-content p {
+    font-size: 11px;
+  }
+}
+@media (max-width: 400px) {
+  .header {
+    width: min(100% - 20px, 1200px);
+  }
+
+  .header h1 {
+    font-size: 18px;
+  }
+
+  .connection-status {
+    padding: 6px 8px;
+    font-size: 10px;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .main-content {
+    width: min(100% - 20px, 1200px);
+  }
+
+  .hero {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .benchmark-summary {
+    gap: 8px;
+  }
+
+  .benchmark-stat {
+    padding: 10px;
+  }
+
+  .benchmark-stat span {
+    font-size: 10px;
+  }
+
+  .benchmark-stat strong {
+    font-size: 14px;
+  }
+
+  .latency-row {
+    grid-template-columns: 68px minmax(0, 1fr) 58px;
+    font-size: 11px;
+  }
+}
+@media (max-width: 500px) {
+  .header {
+    gap: 12px;
+  }
+
+  .header h1 {
+    white-space: nowrap;
+  }
+
+  .connection-status {
+    flex-shrink: 0;
   }
 }
 .mic-button.recording {
