@@ -8,6 +8,7 @@ import Waveform from "./components/Waveform";
 import TranscriptPanel from "./components/TranscriptPanel";
 import AnswerPanel from "./components/AnswerPanel";
 import LatencyPanel from "./components/LatencyPanel";
+import BenchmarkPanel from "./components/BenchmarkPanel";
 const mockCitations = [
   {
     id: "source-1",
@@ -30,6 +31,52 @@ const mockLatency = {
   llm: 400,
   total: 575,
 };
+
+const mockBenchmark = {
+  total_queries_executed: 36,
+  unique_queries_count: 12,
+  target_p50_ms: 200,
+  achieved_p50_ms: 0.13,
+  target_met: true,
+
+  stage_percentiles_ms: {
+    embedding: {
+      p50: 0,
+      p70: 6.19,
+      p90: 7.3,
+      p100: 9.4,
+    },
+
+    retrieval: {
+      p50: 0,
+      p70: 0.55,
+      p90: 0.72,
+      p100: 0.85,
+    },
+
+    guardrail: {
+      p50: 0,
+      p70: 0.08,
+      p90: 0.15,
+      p100: 0.5,
+    },
+
+    llm_ttft: {
+      p50: 0,
+      p70: 0,
+      p90: 3,
+      p100: 3,
+    },
+
+    total: {
+      p50: 0.13,
+      p70: 7.6,
+      p90: 951.59,
+      p100: 5449.6,
+    },
+  },
+};
+
 
 function App() {
   const { recordingState, error, audioLevel, startRecording, stopRecording } =
@@ -87,6 +134,7 @@ function App() {
         </section>
 
         <LatencyPanel latency={mockLatency} />
+        <BenchmarkPanel benchmark={mockBenchmark} />
       </main>
     </div>
   );
