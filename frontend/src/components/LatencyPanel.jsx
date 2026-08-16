@@ -7,7 +7,12 @@ const latencyStages = [
 ];
 
 function LatencyPanel({ latency = {} }) {
+  // const total = latency.total ?? null;
   const total = latency.total ?? null;
+
+  const stageValues = latencyStages.map((stage) => latency[stage.key] ?? 0);
+
+  const maxStageLatency = Math.max(...stageValues, 1);
 
   return (
     <section className="panel latency-panel">
@@ -21,6 +26,8 @@ function LatencyPanel({ latency = {} }) {
       <div className="latency-list">
         {latencyStages.map((stage) => {
           const value = latency[stage.key] ?? null;
+          const percentage =
+            value !== null && total ? ((value / total) * 100).toFixed(1) : null;
 
           return (
             <div className="latency-row" key={stage.key}>
@@ -30,12 +37,16 @@ function LatencyPanel({ latency = {} }) {
                 <div
                   className="latency-bar"
                   style={{
-                    width: value ? `${Math.min(value, 200) / 2}%` : "0%",
+                    // width: value ? `${Math.min(value, 200) / 2}%` : "0%",
+                    width: value ? `${(value / maxStageLatency) * 100}%` : "0%",
                   }}
                 ></div>
               </div>
 
-              <span>{value !== null ? `${value} ms` : "— ms"}</span>
+              {/* <span>{value !== null ? `${value} ms` : "— ms"}</span> */}
+              <span>
+                {value !== null ? `${value} ms (${percentage}%)` : "— ms"}
+              </span>
             </div>
           );
         })}

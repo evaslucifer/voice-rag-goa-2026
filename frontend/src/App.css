@@ -19,8 +19,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top, #18202d 0%, #07090d 45%);
+  background: radial-gradient(circle at top, #18202d 0%, #07090d 45%);
 }
 
 button {
@@ -247,6 +246,8 @@ button {
   width: 0%;
   height: 100%;
   border-radius: inherit;
+  background: #7f8b9d;
+  transition: width 0.4s ease;
 }
 
 @media (max-width: 700px) {
