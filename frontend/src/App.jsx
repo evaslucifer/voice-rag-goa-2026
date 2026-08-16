@@ -22,6 +22,14 @@ const mockCitations = [
     score: 0.87,
   },
 ];
+const mockLatency = {
+  stt: 120,
+  embedding: 30,
+  retrieval: 20,
+  guardrail: 5,
+  llm: 400,
+  total: 575,
+};
 
 function App() {
   const { recordingState, error, audioLevel, startRecording, stopRecording } =
@@ -78,7 +86,7 @@ function App() {
           />
         </section>
 
-        <LatencyPanel />
+        <LatencyPanel latency={mockLatency} />
       </main>
     </div>
   );
