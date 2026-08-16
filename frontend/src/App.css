@@ -271,6 +271,16 @@ button {
     grid-template-columns: 80px 1fr 60px;
     gap: 10px;
   }
+  .benchmark-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .benchmark-row {
+    grid-template-columns: 1.3fr repeat(4, minmax(55px, 1fr));
+    gap: 6px;
+
+    font-size: 10px;
+  }
 }
 .mic-button.recording {
   transform: scale(1.08);
@@ -375,4 +385,89 @@ button {
 .citation-score {
   font-size: 10px;
   color: #687486;
+}
+
+.benchmark-panel {
+  margin-top: 16px;
+}
+
+.benchmark-status {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: #7f8b9d;
+}
+
+.benchmark-status-success {
+  color: #42d392;
+}
+
+.benchmark-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.benchmark-stat {
+  padding: 14px;
+
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.benchmark-stat span {
+  display: block;
+  margin-bottom: 8px;
+
+  color: #7f8b9d;
+  font-size: 11px;
+}
+
+.benchmark-stat strong {
+  color: #dce2ea;
+  font-size: 18px;
+}
+
+.benchmark-section-header {
+  margin-bottom: 12px;
+}
+
+.benchmark-section-header h4 {
+  margin: 0;
+
+  color: #8d99aa;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.benchmark-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.benchmark-row {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(4, 1fr);
+  gap: 12px;
+
+  padding: 12px 0;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+  color: #aeb7c5;
+  font-size: 12px;
+}
+
+.benchmark-row:last-child {
+  border-bottom: none;
+}
+
+.benchmark-row-header {
+  color: #687486;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
