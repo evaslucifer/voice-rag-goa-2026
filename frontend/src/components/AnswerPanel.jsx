@@ -1,9 +1,30 @@
-function AnswerPanel({ answer = "", citations = [] }) {
+function AnswerPanel({
+  answer = "",
+  citations = [],
+  status = "IDLE",
+}) {
+  const normalizedStatus = status.toUpperCase();
+
+  const statusLabel = {
+    SUCCESS: "GROUNDED",
+    REFUSED: "REFUSED",
+    PARTIAL: "PARTIAL",
+    ERROR: "ERROR",
+    IDLE: "WAITING",
+  };
+
+  const displayStatus = statusLabel[normalizedStatus] || normalizedStatus;
+
   return (
     <section className="panel">
       <div className="panel-header">
         <h3>Answer</h3>
-        <span className="panel-status">GROUNDED</span>
+
+        <span
+          className={`panel-status answer-status-${normalizedStatus.toLowerCase()}`}
+        >
+          {displayStatus}
+        </span>
       </div>
 
       <p className="answer-text">
@@ -19,7 +40,10 @@ function AnswerPanel({ answer = "", citations = [] }) {
 
           <div className="citation-list">
             {citations.map((citation, index) => (
-              <article className="citation-card" key={citation.id || index}>
+              <article
+                className="citation-card"
+                key={citation.id || index}
+              >
                 <div className="citation-number">{index + 1}</div>
 
                 <div className="citation-content">

@@ -21,6 +21,7 @@ function useAudioRecorder() {
   const startRecording = useCallback(async () => {
     try {
       setError(null);
+      pcmChunksRef.current = [];
       
 
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -175,6 +176,7 @@ function useAudioRecorder() {
       }
 
       setAudioLevel(0);
+      setRecordingState("idle");
     }
   }, []);
 
