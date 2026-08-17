@@ -1,4 +1,6 @@
 import { useCallback, useRef, useState } from "react";
+import { sendVoiceQuery } from "../services/api";
+import { pcmChunksToWav } from "../utils/pcmToWav";
 // import { float32ToInt16 } from "../utils/audioProcessor";
 
 function useAudioRecorder() {
@@ -12,12 +14,14 @@ function useAudioRecorder() {
   const sourceRef = useRef(null);
   const analyserRef = useRef(null);
   const animationFrameRef = useRef(null);
+  const pcmChunksRef = useRef([]);
 
   const [audioLevel, setAudioLevel] = useState(0);
 
   const startRecording = useCallback(async () => {
     try {
       setError(null);
+      
 
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -78,6 +82,13 @@ function useAudioRecorder() {
       workletNode.port.onmessage = (event) => {
         const pcmData = event.data;
 
+        if (!(pcmData instanceof Int16Array)) {
+          console.warn("Unexpected PCM data:", pcmData);
+          return;
+        }
+
+        pcmChunksRef.current.push(pcmData);
+
         console.log("PCM chunk:", {
           samples: pcmData.length,
           sampleRate: 16000,
@@ -97,45 +108,74 @@ function useAudioRecorder() {
     }
   }, []);
 
-  const stopRecording = useCallback(() => {
-    if (workletNodeRef.current) {
-      workletNodeRef.current.disconnect();
-      workletNodeRef.current = null;
-    }
+  const stopRecording = useCallback(async () => {
+    setRecordingState("processing");
 
-    if (sourceRef.current) {
-      sourceRef.current.disconnect();
-      sourceRef.current = null;
-    }
+    const chunks = pcmChunksRef.current;
 
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => {
-        track.stop();
+    try {
+      if (chunks.length === 0) {
+        throw new Error("No audio was captured.");
+      }
+
+      const audioBlob = pcmChunksToWav(chunks, 16000);
+
+      console.log("Voice recording ready:", {
+        chunks: chunks.length,
+        size: audioBlob.size,
+        type: audioBlob.type,
       });
 
-      streamRef.current = null;
+      const result = await sendVoiceQuery(audioBlob, "en-IN");
+
+      console.log("Voice RAG response:", result);
+
+      pcmChunksRef.current = [];
+
+      return result;
+    } catch (err) {
+      console.error("Voice query failed:", err);
+
+      setError(err.message || "Voice query failed.");
+      setRecordingState("error");
+
+      return null;
+    } finally {
+      if (workletNodeRef.current) {
+        workletNodeRef.current.disconnect();
+        workletNodeRef.current = null;
+      }
+
+      if (sourceRef.current) {
+        sourceRef.current.disconnect();
+        sourceRef.current = null;
+      }
+
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => {
+          track.stop();
+        });
+
+        streamRef.current = null;
+      }
+
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+        audioContextRef.current = null;
+      }
+
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+
+      if (analyserRef.current) {
+        analyserRef.current.disconnect();
+        analyserRef.current = null;
+      }
+
+      setAudioLevel(0);
     }
-
-    if (audioContextRef.current) {
-      audioContextRef.current.close();
-      audioContextRef.current = null;
-    }
-
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-      animationFrameRef.current = null;
-    }
-
-    if (analyserRef.current) {
-      analyserRef.current.disconnect();
-      analyserRef.current = null;
-    }
-
-    setAudioLevel(0);
-    // change when backen will be integrated
-    // setRecordingState("processing");
-
-    setRecordingState("idle");
   }, []);
 
   return {

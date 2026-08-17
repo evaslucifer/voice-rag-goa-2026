@@ -105,12 +105,17 @@ function App() {
     }
   };
 
-  const handleMicClick = () => {
+  const handleMicClick = async () => {
     console.log("Mic clicked:", recordingState);
+
     if (recordingState === "recording") {
-      stopRecording();
+      const result = await stopRecording();
+
+      if (result) {
+        setQueryResult(result);
+      }
     } else if (recordingState === "idle" || recordingState === "error") {
-      startRecording();
+      await startRecording();
     }
   };
   useEffect(() => {
