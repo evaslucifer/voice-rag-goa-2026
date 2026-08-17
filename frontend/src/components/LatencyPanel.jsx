@@ -3,7 +3,7 @@ const latencyStages = [
   { key: "embedding", label: "Embedding" },
   { key: "retrieval", label: "Qdrant" },
   { key: "guardrail", label: "Guardrail" },
-  { key: "llm", label: "LLM TTFT" },
+  { key: "llm_ttft", label: "LLM TTFT" },
 ];
 
 function LatencyPanel({ latency = {} }) {

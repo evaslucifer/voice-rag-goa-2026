@@ -1,7 +1,7 @@
 import "./App.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useAudioRecorder from "./hooks/useAudioRecorder";
-
+import { checkBackendHealth, sendTextQuery } from "./services/api";
 import Header from "./components/Header";
 import MicButton from "./components/MicButton";
 import Waveform from "./components/Waveform";
@@ -9,28 +9,28 @@ import TranscriptPanel from "./components/TranscriptPanel";
 import AnswerPanel from "./components/AnswerPanel";
 import LatencyPanel from "./components/LatencyPanel";
 import BenchmarkPanel from "./components/BenchmarkPanel";
-const mockCitations = [
-  {
-    id: "source-1",
-    title: "MSMARCO-XI Document 1",
-    text: "This document contains information related to the user's query.",
-    score: 0.94,
-  },
-  {
-    id: "source-2",
-    title: "MSMARCO-XI Document 2",
-    text: "This source provides additional context for the generated answer.",
-    score: 0.87,
-  },
-];
-const mockLatency = {
-  stt: 120,
-  embedding: 30,
-  retrieval: 20,
-  guardrail: 5,
-  llm: 400,
-  total: 575,
-};
+// const mockCitations = [
+//   {
+//     id: "source-1",
+//     title: "MSMARCO-XI Document 1",
+//     text: "This document contains information related to the user's query.",
+//     score: 0.94,
+//   },
+//   {
+//     id: "source-2",
+//     title: "MSMARCO-XI Document 2",
+//     text: "This source provides additional context for the generated answer.",
+//     score: 0.87,
+//   },
+// ];
+// const mockLatency = {
+//   stt: 120,
+//   embedding: 30,
+//   retrieval: 20,
+//   guardrail: 5,
+//   llm: 400,
+//   total: 575,
+// };
 
 const mockBenchmark = {
   total_queries_executed: 36,
@@ -77,10 +77,33 @@ const mockBenchmark = {
   },
 };
 
-
 function App() {
   const { recordingState, error, audioLevel, startRecording, stopRecording } =
     useAudioRecorder();
+  const [queryResult, setQueryResult] = useState(null);
+  const [queryError, setQueryError] = useState(null);
+  const [isQuerying, setIsQuerying] = useState(false);
+
+  const handleTestQuery = async () => {
+    try {
+      setIsQuerying(true);
+      setQueryError(null);
+
+      const result = await sendTextQuery(
+        "What is Qdrant vector database used for?",
+        "en",
+      );
+
+      console.log("RAG response:", result);
+
+      setQueryResult(result);
+    } catch (err) {
+      console.error("Query failed:", err);
+      setQueryError(err.message);
+    } finally {
+      setIsQuerying(false);
+    }
+  };
 
   const handleMicClick = () => {
     console.log("Mic clicked:", recordingState);
@@ -95,6 +118,15 @@ function App() {
       stopRecording();
     };
   }, [stopRecording]);
+  useEffect(() => {
+    checkBackendHealth()
+      .then((data) => {
+        console.log("Backend health:", data);
+      })
+      .catch((error) => {
+        console.error("Backend connection failed:", error);
+      });
+  }, []);
   return (
     <div className="app">
       <Header />
@@ -110,6 +142,15 @@ function App() {
             isRecording={recordingState === "recording"}
             onClick={handleMicClick}
           />
+          <button
+            type="button"
+            className="test-query-button"
+            onClick={handleTestQuery}
+            disabled={isQuerying}
+          >
+            {isQuerying ? "Querying..." : "Test Backend Query"}
+          </button>
+          {queryError && <p className="mic-error">{queryError}</p>}
           <p className="recording-status">
             {recordingState === "idle" && "Click the microphone to start"}
             {recordingState === "recording" && "Listening..."}
@@ -125,15 +166,17 @@ function App() {
         </section>
 
         <section className="content-grid">
-          <TranscriptPanel />
+          <TranscriptPanel
+            transcript={queryResult?.transcript || queryResult?.query || ""}
+          />
 
           <AnswerPanel
-            answer="This is a grounded answer generated from the retrieved corpus."
-            citations={mockCitations}
+            answer={queryResult?.answer || ""}
+            citations={queryResult?.citations || []}
           />
         </section>
 
-        <LatencyPanel latency={mockLatency} />
+        <LatencyPanel latency={queryResult?.latency_breakdown || {}} />
         <BenchmarkPanel benchmark={mockBenchmark} />
       </main>
     </div>

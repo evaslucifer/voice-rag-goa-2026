@@ -23,7 +23,11 @@ function AnswerPanel({ answer = "", citations = [] }) {
                 <div className="citation-number">{index + 1}</div>
 
                 <div className="citation-content">
-                  <h5>{citation.title}</h5>
+                  <h5>
+                    {citation.metadata?.title ||
+                      citation.metadata?.source ||
+                      `Source ${index + 1}`}
+                  </h5>
 
                   {citation.text && <p>{citation.text}</p>}
 
