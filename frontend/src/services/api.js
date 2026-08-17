@@ -28,5 +28,22 @@ export async function sendTextQuery(query, language = "en") {
 
   return response.json();
 }
+export async function sendVoiceQuery(audioBlob, languageHint = "en-IN") {
+  const formData = new FormData();
+
+  formData.append("file", audioBlob, "voice-query.wav");
+  formData.append("language_hint", languageHint);
+
+  const response = await fetch(`${API_BASE_URL}/api/voice/query`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Voice query failed: ${response.status}`);
+  }
+
+  return response.json();
+}
 
 export { API_BASE_URL };
