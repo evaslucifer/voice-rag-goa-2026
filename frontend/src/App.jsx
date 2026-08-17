@@ -1,7 +1,7 @@
 import "./App.css";
 import { useEffect, useState } from "react";
 import useAudioRecorder from "./hooks/useAudioRecorder";
-import { checkBackendHealth, sendTextQuery } from "./services/api";
+import { checkBackendHealth  } from "./services/api";
 import Header from "./components/Header";
 import MicButton from "./components/MicButton";
 import Waveform from "./components/Waveform";
@@ -81,29 +81,9 @@ function App() {
   const { recordingState, error, audioLevel, startRecording, stopRecording } =
     useAudioRecorder();
   const [queryResult, setQueryResult] = useState(null);
-  const [queryError, setQueryError] = useState(null);
-  const [isQuerying, setIsQuerying] = useState(false);
+  
 
-  const handleTestQuery = async () => {
-    try {
-      setIsQuerying(true);
-      setQueryError(null);
-
-      const result = await sendTextQuery(
-        "What is Qdrant vector database used for?",
-        "en",
-      );
-
-      console.log("RAG response:", result);
-
-      setQueryResult(result);
-    } catch (err) {
-      console.error("Query failed:", err);
-      setQueryError(err.message);
-    } finally {
-      setIsQuerying(false);
-    }
-  };
+  
 
   const handleMicClick = async () => {
     console.log("Mic clicked:", recordingState);
@@ -147,15 +127,7 @@ function App() {
             isRecording={recordingState === "recording"}
             onClick={handleMicClick}
           />
-          <button
-            type="button"
-            className="test-query-button"
-            onClick={handleTestQuery}
-            disabled={isQuerying}
-          >
-            {isQuerying ? "Querying..." : "Test Backend Query"}
-          </button>
-          {queryError && <p className="mic-error">{queryError}</p>}
+          
           <p className="recording-status">
             {recordingState === "idle" && "Click the microphone to start"}
             {recordingState === "recording" && "Listening..."}
@@ -178,6 +150,7 @@ function App() {
           <AnswerPanel
             answer={queryResult?.answer || ""}
             citations={queryResult?.citations || []}
+            status={queryResult?.status || "IDLE"}
           />
         </section>
 
