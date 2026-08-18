@@ -11,8 +11,8 @@ __pycache__/
 .venv/
 env/
 venv/
-qdrant_storage/
-backend/qdrant_storage/
+ 
+ 
 backend/benchmarks/results/
 
 # IDE & Language Server
