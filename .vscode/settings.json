@@ -1,0 +1,13 @@
+{
+  "python.defaultInterpreterPath": "D:/Voice-Enabled RAG/.venv/Scripts/python.exe",
+  "python.analysis.extraPaths": [
+    "D:/Voice-Enabled RAG/voice-rag-goa-2026",
+    "D:/Voice-Enabled RAG/voice-rag-goa-2026/backend",
+    "D:/Voice-Enabled RAG/voice-rag-goa-2026/data_pipeline"
+  ],
+  "python.autoComplete.extraPaths": [
+    "D:/Voice-Enabled RAG/voice-rag-goa-2026",
+    "D:/Voice-Enabled RAG/voice-rag-goa-2026/backend",
+    "D:/Voice-Enabled RAG/voice-rag-goa-2026/data_pipeline"
+  ]
+}

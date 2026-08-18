@@ -15,6 +15,10 @@ qdrant_storage/
 backend/qdrant_storage/
 backend/benchmarks/results/
 
+# IDE & Language Server
+.vscode/
+pyrightconfig.json
+
 # Distribution / packaging
 .Python
 build/

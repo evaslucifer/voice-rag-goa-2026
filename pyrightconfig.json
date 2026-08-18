@@ -1,0 +1,9 @@
+{
+  "venvPath": "D:/Voice-Enabled RAG",
+  "venv": ".venv",
+  "extraPaths": [
+    "D:/Voice-Enabled RAG/voice-rag-goa-2026",
+    "D:/Voice-Enabled RAG/voice-rag-goa-2026/backend",
+    "D:/Voice-Enabled RAG/voice-rag-goa-2026/data_pipeline"
+  ]
+}
