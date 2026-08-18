@@ -1,0 +1,11 @@
+Metric,Count,P50 (ms),P70 (ms),P100 (ms),Min (ms),Max (ms),Mean (ms),StdDev (ms)
+Total Retrieval Latency,100,7.31,7.93,12.16,6.04,12.16,7.49,1.02
+Query Embedding Latency,100,5.95,6.54,10.39,4.85,10.39,6.13,0.9
+Vector Search Latency,100,1.23,1.53,3.03,0.89,3.03,1.35,0.3
+
+Category,Count,P50 (ms),P70 (ms),P100 (ms),Min (ms),Max (ms),Mean (ms),
+in_domain,50,7.65,8.12,10.06,6.04,10.06,7.71,
+ambiguous,15,6.83,7.05,8.4,6.04,8.4,6.84,
+no_answer,15,7.34,7.71,8.51,6.78,8.51,7.47,
+off_topic,10,6.4,6.55,7.05,6.13,7.05,6.56,
+prompt_injection,10,7.65,7.97,12.16,7.12,12.16,8.32,
