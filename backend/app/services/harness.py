@@ -160,11 +160,9 @@ Retrieved Context:
             )
 
         top_chunk = inp.retrieved_chunks[0]
-        # Extract prominent informative sentence
-        sentences = [s.strip() for s in top_chunk.text.split(".") if len(s.strip()) > 15]
-        summary_sentence = sentences[0] if sentences else top_chunk.text[:200]
-
-        answer = f"Based on the retrieved knowledge: {summary_sentence}."
+        # Keep abbreviations such as "Dr." inside the retrieved passage.
+        grounded_text = top_chunk.text.strip()
+        answer = f"Based on the retrieved knowledge: {grounded_text}"
         citations = [
             CitationItem(
                 id=top_chunk.chunk_id,

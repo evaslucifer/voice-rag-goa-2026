@@ -44,7 +44,7 @@ class RAGService:
             tracker = LatencyTracker()
 
         clean_query = query.strip()
-        cache_key = f"rag:{language}:{clean_query.lower()}"
+        cache_key = f"rag:v2:{language}:{clean_query.lower()}"
 
         # 1. Cache Check
         cached_data = self.cache_service.get(cache_key)
