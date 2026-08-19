@@ -30,7 +30,7 @@ class LLMResponse(BaseModel):
     confidence_score: float = Field(default=0.9, description="Confidence score between 0.0 and 1.0")
     citations: List[CitationItem] = Field(default_factory=list, description="Citations used in answer")
     ttft_ms: float = Field(default=0.0, description="Time to first token / inference response latency in ms")
-    model_name: str = Field(default="llama-3.1-8b-instant", description="Model used for generation")
+    model_name: str = Field(default="openai/gpt-oss-20b", description="Model used for generation")
     raw_response: Optional[Dict[str, Any]] = Field(default=None, description="Raw LLM provider response")
 
 
@@ -40,16 +40,32 @@ class LLMService:
     def __init__(
         self,
         api_key: Optional[str] = None,
-        model_name: str = "llama-3.1-8b-instant",
-        timeout_seconds: float = 8.0,
+        model_name: Optional[str] = None,
+        timeout_seconds:  Optional[float] = None,
         temperature: float = 0.1,
         harness: Optional[ModelHarness] = None,
     ) -> None:
         self.settings = get_settings()
-        self.api_key = api_key if api_key is not None else self.settings.GROQ_API_KEY
-        self.model_name = model_name
-        self.timeout_seconds = timeout_seconds
+        self.api_key = (
+            api_key
+            if api_key is not None
+            else self.settings.GROQ_API_KEY
+        )
+
+        self.model_name = (
+            model_name
+            if model_name is not None
+            else self.settings.LLM_MODEL
+        )
+
+        self.timeout_seconds = (
+            timeout_seconds
+            if timeout_seconds is not None
+            else self.settings.LLM_TIMEOUT_SECONDS
+        )
+
         self.temperature = temperature
+
         self.harness = harness or ModelHarness(
             groq_api_key=self.api_key,
             primary_model=self.model_name,

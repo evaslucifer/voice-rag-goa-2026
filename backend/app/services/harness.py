@@ -3,6 +3,8 @@
 import json
 import time
 import uuid
+import re
+
 from functools import lru_cache
 from typing import Any, Dict, List, Optional
 import httpx
@@ -17,8 +19,7 @@ from app.utils.logging import get_logger
 logger = get_logger("app.services.harness")
 
 GROQ_CHAT_URL = "https://api.groq.com/openai/v1/chat/completions"
-GEMINI_GENERATE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
-
+GEMINI_GENERATE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent"
 
 class HarnessError(Exception):
     """Base exception for model harness errors."""
@@ -39,7 +40,7 @@ class HarnessInput(BaseModel):
     language: str = Field(default="en", description="Target response language")
     request_id: str = Field(default_factory=lambda: str(uuid.uuid4()), description="Trace request ID")
     temperature: float = Field(default=0.1, description="Sampling temperature")
-    max_tokens: int = Field(default=512, description="Max generated tokens")
+    max_tokens: int = Field(default=1024, description="Max generated tokens")
 
 
 class HarnessOutput(BaseModel):
@@ -50,7 +51,7 @@ class HarnessOutput(BaseModel):
     citations: List[CitationItem] = Field(default_factory=list, description="Citations tied to retrieved chunks")
     status: str = Field(default="SUCCESS", description="Execution status: SUCCESS or REFUSED")
     latency_breakdown: Dict[str, float] = Field(default_factory=dict, description="Latency breakdown in ms")
-    model_used: str = Field(default="llama-3.1-8b-instant", description="Exact model name used")
+    model_used: str = Field(default="openai/gpt-oss-20b", description="Exact model name used")
     provider_used: str = Field(default="groq", description="Provider used: groq, gemini, or local-fallback")
     is_fallback: bool = Field(default=False, description="True if response came from fallback engine")
     ttft_ms: float = Field(default=0.0, description="Time to first token / generation latency in ms")
@@ -83,17 +84,41 @@ class ModelHarness:
         self,
         groq_api_key: Optional[str] = None,
         gemini_api_key: Optional[str] = None,
-        primary_model: str = "llama-3.1-8b-instant",
-        fallback_model: str = "gemini-1.5-flash",
-        timeout_seconds: float = 6.0,
+        primary_model: Optional[str] = None,
+        fallback_model: Optional[str] = None,
+        timeout_seconds: Optional[float] = None,
     ) -> None:
         self.settings = get_settings()
-        self.groq_api_key = groq_api_key if groq_api_key is not None else self.settings.GROQ_API_KEY
-        self.gemini_api_key = gemini_api_key if gemini_api_key is not None else self.settings.GEMINI_API_KEY
-        self.primary_model = primary_model
-        self.fallback_model = fallback_model
-        self.timeout_seconds = timeout_seconds
 
+        self.groq_api_key = (
+            groq_api_key
+            if groq_api_key is not None
+            else self.settings.GROQ_API_KEY
+        )
+
+        self.gemini_api_key = (
+            gemini_api_key
+            if gemini_api_key is not None
+            else self.settings.GEMINI_API_KEY
+        )
+
+        self.primary_model = (
+            primary_model
+            if primary_model is not None
+            else self.settings.LLM_MODEL
+        )
+
+        self.fallback_model = (
+            fallback_model
+            if fallback_model is not None
+            else self.settings.LLM_FALLBACK_MODEL
+        )
+
+        self.timeout_seconds = (
+            timeout_seconds
+            if timeout_seconds is not None
+            else self.settings.LLM_TIMEOUT_SECONDS
+        )   
     @property
     def has_groq_credentials(self) -> bool:
         if getattr(self, "_groq_auth_failed", False):
@@ -162,7 +187,17 @@ Retrieved Context:
         top_chunk = inp.retrieved_chunks[0]
         # Keep abbreviations such as "Dr." inside the retrieved passage.
         grounded_text = top_chunk.text.strip()
-        answer = f"Based on the retrieved knowledge: {grounded_text}"
+
+        # Remove internal dataset/reference markers from the user-facing answer.
+
+        grounded_text = re.sub(
+            r"\s*\[Section\s+\d+\s+reference\s+context\]\.?",
+            "",
+            grounded_text,
+            flags=re.IGNORECASE,
+        ).strip()
+
+        answer = grounded_text
         citations = [
             CitationItem(
                 id=top_chunk.chunk_id,

@@ -86,7 +86,10 @@ class RAGService:
             )
 
         # 3. Retrieval (Embedding + Vector Search)
-        retrieval_res = await self.retrieval_service.retrieve(query=clean_query)
+        retrieval_res = await self.retrieval_service.retrieve(
+            query=clean_query,
+            language=language,
+        )
         tracker.record("embedding", retrieval_res.embedding_latency_ms)
         tracker.record("retrieval", retrieval_res.retrieval_latency_ms)
 

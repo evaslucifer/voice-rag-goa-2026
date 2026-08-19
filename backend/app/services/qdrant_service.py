@@ -4,7 +4,7 @@ from functools import lru_cache
 from typing import Any, Dict, List, Optional, Union
 from qdrant_client import AsyncQdrantClient
 from qdrant_client.http.exceptions import UnexpectedResponse
-from qdrant_client.models import Distance, PointStruct, VectorParams
+from qdrant_client.models import Distance, FieldCondition, Filter, MatchValue, PointStruct, VectorParams
 from app.config import get_settings
 from app.utils.logging import get_logger
 
@@ -195,30 +195,54 @@ class QdrantService:
         top_k: int = 5,
         collection_name: Optional[str] = None,
         score_threshold: Optional[float] = None,
+        language: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
         """Vector similarity search returning top-k matching documents with scores and payloads."""
         target_collection = collection_name or self.collection_name
+
         if not query_vector:
             raise QdrantServiceError("Query vector cannot be empty.")
 
         try:
             client = self._get_client()
+
+            query_filter = None
+
+            if language:
+                query_filter = Filter(
+                    must=[
+                        FieldCondition(
+                            key="language",
+                            match=MatchValue(value=language.lower()),
+                        )
+                    ]
+                )
+
             search_results = await client.query_points(
                 collection_name=target_collection,
                 query=query_vector,
                 limit=top_k,
                 score_threshold=score_threshold,
+                query_filter=query_filter,
             )
+
             results: List[Dict[str, Any]] = []
+
             for hit in getattr(search_results, "points", []):
                 results.append({
                     "id": str(hit.id),
                     "score": float(hit.score) if hit.score is not None else 0.0,
                     "payload": hit.payload or {},
                 })
+
             return results
+
         except Exception as e:
-            logger.error("Vector search failed on collection '%s': %s", target_collection, str(e))
+            logger.error(
+                "Vector search failed on collection '%s': %s",
+                target_collection,
+                str(e),
+            )
             raise QdrantServiceError(f"Vector search failed: {e}") from e
 
 

@@ -57,8 +57,8 @@ class Settings(BaseSettings):
 
      
     LLM_PROVIDER: str = Field(default="groq", description="LLM provider: groq, gemini, or local")
-    LLM_MODEL: str = Field(default="llama-3.1-8b-instant", description="Primary LLM model identifier")
-    LLM_FALLBACK_MODEL: str = Field(default="gemini-1.5-flash", description="Fallback LLM model identifier")
+    LLM_MODEL: str = Field(default="openai/gpt-oss-20b", description="Primary LLM model identifier")
+    LLM_FALLBACK_MODEL: str = Field( "gemini-3.6-flash", description="Fallback LLM model identifier")
     LLM_TEMPERATURE: float = Field(default=0.1, description="LLM sampling temperature")
     LLM_TIMEOUT_SECONDS: float = Field(default=6.0, description="LLM timeout in seconds")
 

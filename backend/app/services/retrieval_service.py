@@ -57,9 +57,13 @@ class RetrievalService:
         top_k: Optional[int] = None,
         score_threshold: Optional[float] = None,
         collection_name: Optional[str] = None,
+        language: Optional[str] = None,
     ) -> RetrievalResult:
         """Embed the query, search Qdrant, filter results, and assemble context."""
         k = top_k or self.top_k
+
+        # Retrieve extra candidates when language preference is available.
+        search_k = k * 3 if language else k
         threshold = score_threshold if score_threshold is not None else self.score_threshold
 
         # 1. Measure embedding latency
@@ -73,13 +77,29 @@ class RetrievalService:
         try:
             raw_hits = await self.qdrant_service.search_vectors(
                 query_vector=query_vector,
-                top_k=k,
+                top_k=search_k,
                 collection_name=collection_name,
                 score_threshold=threshold,
+		language=language,
             )
         except Exception as e:
             logger.warning("Vector search returned empty/error: %s", str(e))
             raw_hits = []
+        if language:
+            preferred_hits = [
+                hit
+                for hit in raw_hits
+                if str(
+                    (hit.get("payload") or {}).get("language", "en")
+                ).lower() == language.lower()
+            ]
+
+            if preferred_hits:
+                raw_hits = preferred_hits[:k]
+            else:
+                raw_hits = raw_hits[:k]
+        else:
+                raw_hits = raw_hits[:k]
 
         retrieval_latency_ms = round((time.perf_counter() - t_search_start) * 1000.0, 2)
 
