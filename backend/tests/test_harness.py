@@ -40,6 +40,30 @@ async def test_harness_local_fallback_when_unconfigured() -> None:
 
 
 @pytest.mark.asyncio
+async def test_harness_local_fallback_does_not_stop_at_abbreviation() -> None:
+    """Ensure periods in abbreviations do not truncate grounded text."""
+    harness = ModelHarness(groq_api_key="", gemini_api_key="")
+    chunk = RetrievedChunk(
+        document_id="doc_isro",
+        chunk_id="doc_isro_chk_0",
+        text="The Indian Space Research Organisation (ISRO) was founded in 1969 by Dr. Vikram Sarabhai to develop space technology.",
+        score=0.69,
+        language="en",
+    )
+    inp = HarnessInput(
+        query="What is ISRO?",
+        context_text=chunk.text,
+        retrieved_chunks=[chunk],
+        language="en",
+    )
+
+    out = await harness.execute(inp)
+
+    assert "Dr. Vikram Sarabhai" in out.answer
+    assert out.answer.endswith("technology.")
+
+
+@pytest.mark.asyncio
 async def test_harness_groq_primary_success() -> None:
     """Test successful primary Groq LLM execution."""
     harness = ModelHarness(groq_api_key="gsk_valid_key", gemini_api_key="")
