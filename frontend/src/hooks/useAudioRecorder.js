@@ -3,7 +3,7 @@ import { sendVoiceQuery } from "../services/api";
 import { pcmChunksToWav } from "../utils/pcmToWav";
 // import { float32ToInt16 } from "../utils/audioProcessor";
 
-function useAudioRecorder() {
+function useAudioRecorder(language = "en-IN") {
   const [recordingState, setRecordingState] = useState("idle");
   const [error, setError] = useState(null);
 
@@ -127,7 +127,7 @@ function useAudioRecorder() {
         type: audioBlob.type,
       });
 
-      const result = await sendVoiceQuery(audioBlob, "en-IN");
+      const result = await sendVoiceQuery(audioBlob, language);
 
       console.log("Voice RAG response:", result);
 
@@ -178,7 +178,7 @@ function useAudioRecorder() {
       setAudioLevel(0);
       setRecordingState("idle");
     }
-  }, []);
+  }, [language]);
 
   return {
     recordingState,

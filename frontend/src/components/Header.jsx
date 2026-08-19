@@ -1,4 +1,4 @@
-function Header() {
+function Header({ backendOnline }) {
   return (
     <header className="header">
       <div>
@@ -7,8 +7,13 @@ function Header() {
       </div>
 
       <div className="connection-status">
-        <span className="status-dot"></span>
-        <span>Connected</span>
+        <span
+          className={`status-dot ${backendOnline ? "online" : "offline"}`}
+        ></span>
+
+        <span>
+          {backendOnline ? "Connected" : "Backend Offline"}
+        </span>
       </div>
     </header>
   );

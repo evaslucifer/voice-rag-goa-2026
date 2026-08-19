@@ -1,7 +1,7 @@
 import "./App.css";
 import { useEffect, useState } from "react";
 import useAudioRecorder from "./hooks/useAudioRecorder";
-import { checkBackendHealth  } from "./services/api";
+import { checkBackendHealth, sendTextQuery } from "./services/api";
 import Header from "./components/Header";
 import MicButton from "./components/MicButton";
 import Waveform from "./components/Waveform";
@@ -78,12 +78,55 @@ const mockBenchmark = {
 };
 
 function App() {
-  const { recordingState, error, audioLevel, startRecording, stopRecording } =
-    useAudioRecorder();
   const [queryResult, setQueryResult] = useState(null);
-  
+  const [textQuery, setTextQuery] = useState("");
+  const [language, setLanguage] = useState("en");
+  const [isQuerying, setIsQuerying] = useState(false);
+  const [backendOnline, setBackendOnline] = useState(false);
 
-  
+  const voiceLanguage =
+    language === "en"
+      ? "en-IN"
+      : language === "hi"
+        ? "hi-IN"
+        : language === "te"
+          ? "te-IN"
+          : language === "ta"
+            ? "ta-IN"
+            : language === "mr"
+              ? "mr-IN"
+              : "bn-IN";
+  const { recordingState, error, audioLevel, startRecording, stopRecording } =
+    useAudioRecorder(voiceLanguage);
+
+  const handleTextQuery = async (event) => {
+    event.preventDefault();
+
+    const cleanQuery = textQuery.trim();
+
+    if (!cleanQuery || isQuerying) {
+      return;
+    }
+
+    try {
+      setIsQuerying(true);
+      setQueryResult(null);
+
+      const result = await sendTextQuery(cleanQuery, language);
+
+      setQueryResult(result);
+    } catch (err) {
+      console.error("Text query failed:", err);
+      setQueryResult({
+        status: "ERROR",
+        answer: err.message || "Unable to process your question.",
+        citations: [],
+        latency_breakdown: {},
+      });
+    } finally {
+      setIsQuerying(false);
+    }
+  };
 
   const handleMicClick = async () => {
     console.log("Mic clicked:", recordingState);
@@ -103,18 +146,21 @@ function App() {
       stopRecording();
     };
   }, [stopRecording]);
+
   useEffect(() => {
     checkBackendHealth()
       .then((data) => {
         console.log("Backend health:", data);
+        setBackendOnline(true);
       })
       .catch((error) => {
         console.error("Backend connection failed:", error);
+        setBackendOnline(false);
       });
   }, []);
   return (
     <div className="app">
-      <Header />
+      <Header backendOnline={backendOnline} />
 
       <main className="main-content">
         <section className="hero">
@@ -123,11 +169,46 @@ function App() {
           <p className="hero-description">
             Speak naturally and get a grounded answer from MSMARCO-XI.
           </p>
+          <form className="query-form" onSubmit={handleTextQuery}>
+            <div className="query-input-wrapper">
+              <input
+                type="text"
+                value={textQuery}
+                onChange={(event) => setTextQuery(event.target.value)}
+                placeholder="Ask a question about MSMARCO-XI..."
+                disabled={isQuerying || recordingState === "recording"}
+              />
+
+              <button type="submit" disabled={!textQuery.trim() || isQuerying}>
+                {isQuerying ? "Asking..." : "Ask"}
+              </button>
+            </div>
+          </form>
+
+          <div className="language-selector">
+            <label htmlFor="language">Language</label>
+
+            <select
+              id="language"
+              value={language}
+              onChange={(event) => setLanguage(event.target.value)}
+              disabled={isQuerying || recordingState === "recording"}
+            >
+              <option value="en">English</option>
+              <option value="hi">Hindi</option>
+              <option value="te">Telugu</option>
+              <option value="ta">Tamil</option>
+              <option value="mr">Marathi</option>
+              <option value="bn">Bengali</option>
+            </select>
+          </div>
+
+          <p className="query-divider">OR SPEAK</p>
           <MicButton
             isRecording={recordingState === "recording"}
             onClick={handleMicClick}
           />
-          
+
           <p className="recording-status">
             {recordingState === "idle" && "Click the microphone to start"}
             {recordingState === "recording" && "Listening..."}
