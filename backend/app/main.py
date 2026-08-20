@@ -13,6 +13,7 @@ from app.api.routes import api_router
 from app.config import get_settings
 from app.schemas.response import ErrorDetail, ErrorResponse
 from app.services.qdrant_service import get_qdrant_service
+from app.services.embedding_service import get_embedding_service
 from app.utils.logging import configure_logging, get_logger
 
 logger = get_logger("app.main")
@@ -35,6 +36,17 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     )
 
     # Initialize / verify services lazily
+    try:
+        embedding_service = get_embedding_service()
+        embedding_service.initialize()
+        logger.info("Embedding service initialized successfully")
+    except Exception as e:
+        logger.error(
+            "Failed to initialize embedding service during startup: %s",
+            str(e),
+            exc_info=True,
+        )
+        raise
     yield
 
     # Shutdown logic

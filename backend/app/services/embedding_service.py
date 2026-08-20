@@ -1,9 +1,11 @@
-"""Embedding service using local FastEmbed ONNX BGE-Small model."""
+"""Embedding service using local FastEmbed ONNX model."""
 
 import asyncio
 from functools import lru_cache
 from typing import List, Optional
+
 from fastembed import TextEmbedding
+
 from app.config import get_settings
 from app.utils.logging import get_logger
 
@@ -30,16 +32,32 @@ class EmbeddingService:
         self.settings = get_settings()
         self.model_name = self.settings.EMBEDDING_MODEL_NAME
 
+    def initialize(self) -> None:
+        """Initialize the embedding model during application startup."""
+        if self._model is not None:
+            return
+
+        logger.info("Initializing FastEmbed model: %s", self.model_name)
+
+        try:
+            self._model = TextEmbedding(model_name=self.model_name)
+            logger.info("FastEmbed model initialized successfully")
+        except Exception as e:
+            logger.error(
+                "Failed to load FastEmbed model: %s",
+                str(e),
+                exc_info=True,
+            )
+            raise EmbeddingServiceError(
+                f"Failed to initialize embedding model "
+                f"'{self.model_name}': {e}"
+            ) from e
+
     def _get_model(self) -> TextEmbedding:
-        """Lazily initialize and return the FastEmbed ONNX model instance."""
+        """Return the initialized FastEmbed model."""
         if self._model is None:
-            logger.info("Initializing FastEmbed model: %s", self.model_name)
-            try:
-                self._model = TextEmbedding(model_name=self.model_name)
-                logger.info("FastEmbed model initialized successfully")
-            except Exception as e:
-                logger.error("Failed to load FastEmbed model: %s", str(e), exc_info=True)
-                raise EmbeddingServiceError(f"Failed to initialize embedding model '{self.model_name}': {e}") from e
+            self.initialize()
+
         return self._model
 
     def is_initialized(self) -> bool:
@@ -49,41 +67,77 @@ class EmbeddingService:
     def _sync_embed_query(self, query: str) -> List[float]:
         """Synchronous query embedding computation."""
         model = self._get_model()
-        # FastEmbed embed returns an iterable of numpy arrays or lists
-        embeddings = list(model.embed([query]))
-        if not embeddings:
-            raise EmbeddingServiceError("No embedding was generated for the query.")
-        return embeddings[0].tolist() if hasattr(embeddings[0], "tolist") else list(embeddings[0])
 
-    def _sync_embed_documents(self, documents: List[str]) -> List[List[float]]:
+        embeddings = list(model.embed([query]))
+
+        if not embeddings:
+            raise EmbeddingServiceError(
+                "No embedding was generated for the query."
+            )
+
+        return (
+            embeddings[0].tolist()
+            if hasattr(embeddings[0], "tolist")
+            else list(embeddings[0])
+        )
+
+    def _sync_embed_documents(
+        self,
+        documents: List[str],
+    ) -> List[List[float]]:
         """Synchronous batch document embedding computation."""
+
         if not documents:
             return []
+
         model = self._get_model()
-        embeddings = list(model.embed(documents, batch_size=self.settings.EMBEDDING_BATCH_SIZE))
+
+        embeddings = list(
+            model.embed(
+                documents,
+                batch_size=self.settings.EMBEDDING_BATCH_SIZE,
+            )
+        )
+
         return [
             emb.tolist() if hasattr(emb, "tolist") else list(emb)
             for emb in embeddings
         ]
 
     async def embed_query(self, query: str) -> List[float]:
-        """Asynchronously compute query embedding vector offloaded to threadpool."""
+        """Asynchronously compute query embedding offloaded to threadpool."""
+
         if not query or not query.strip():
             raise EmbeddingServiceError("Query cannot be empty.")
+
         try:
-            return await asyncio.to_thread(self._sync_embed_query, query)
+            return await asyncio.to_thread(
+                self._sync_embed_query,
+                query,
+            )
         except Exception as e:
             if not isinstance(e, EmbeddingServiceError):
-                raise EmbeddingServiceError(f"Embedding computation failed: {e}") from e
+                raise EmbeddingServiceError(
+                    f"Embedding computation failed: {e}"
+                ) from e
             raise
 
-    async def embed_documents(self, documents: List[str]) -> List[List[float]]:
-        """Asynchronously compute document embeddings batch offloaded to threadpool."""
+    async def embed_documents(
+        self,
+        documents: List[str],
+    ) -> List[List[float]]:
+        """Asynchronously compute document embeddings offloaded to threadpool."""
+
         try:
-            return await asyncio.to_thread(self._sync_embed_documents, documents)
+            return await asyncio.to_thread(
+                self._sync_embed_documents,
+                documents,
+            )
         except Exception as e:
             if not isinstance(e, EmbeddingServiceError):
-                raise EmbeddingServiceError(f"Document embedding computation failed: {e}") from e
+                raise EmbeddingServiceError(
+                    f"Document embedding computation failed: {e}"
+                ) from e
             raise
 
 
