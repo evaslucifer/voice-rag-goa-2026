@@ -67,7 +67,7 @@ class Settings(BaseSettings):
 
     # Sarvam STT Service Configuration
     SARVAM_STT_LANGUAGE_CODE: str = Field(default="en-IN", description="Default BCP-47 language code for Sarvam STT")
-    SARVAM_STT_MODEL: str = Field(default="saaras:v2", description="Sarvam STT model identifier")
+    SARVAM_STT_MODEL: str = Field(default="saaras:v1", description="Sarvam STT model identifier")
     SARVAM_STT_TIMEOUT_SECONDS: float = Field(default=10.0, description="Sarvam API timeout in seconds")
 
     @field_validator("CORS_ORIGINS", mode="before")

@@ -78,6 +78,8 @@ class SarvamSTTService:
 
         target_lang = language_code or self.language_code
         target_model = model or self.model
+        if not target_model or target_model in ("saaras:v2", "default"):
+            target_model = "saaras:v1"
 
         headers = {
             "api-subscription-key": self.api_key,
