@@ -21,10 +21,6 @@ COPY backend/requirements.txt ./requirements.txt
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
-# Pre-download the exact embedding model during image build.
-# This prevents the first user request from downloading it.
-RUN python -c "from fastembed import TextEmbedding; TextEmbedding(model_name='sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')"
-
 RUN useradd -m -u 1000 appuser
 
 COPY backend/app ./app

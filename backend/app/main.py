@@ -35,18 +35,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         },
     )
 
-    # Initialize / verify services lazily
-    try:
-        embedding_service = get_embedding_service()
-        embedding_service.initialize()
-        logger.info("Embedding service initialized successfully")
-    except Exception as e:
-        logger.error(
-            "Failed to initialize embedding service during startup: %s",
-            str(e),
-            exc_info=True,
-        )
-        raise
+    # Initialize logging and settings
+    logger.info("Voice-Enabled Multilingual RAG Backend started successfully (services ready for lazy-loading)")
     yield
 
     # Shutdown logic
