@@ -40,8 +40,8 @@ class EmbeddingService:
         logger.info("Initializing FastEmbed model: %s", self.model_name)
 
         try:
-            self._model = TextEmbedding(model_name=self.model_name)
-            logger.info("FastEmbed model initialized successfully")
+            self._model = TextEmbedding(model_name=self.model_name, threads=1)
+            logger.info("FastEmbed model initialized successfully (single-threaded ONNX mode)")
         except Exception as e:
             logger.error(
                 "Failed to load FastEmbed model: %s",
