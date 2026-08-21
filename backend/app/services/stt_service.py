@@ -77,6 +77,22 @@ class SarvamSTTService:
             raise STTServiceError("Audio payload cannot be empty.")
 
         target_lang = language_code or self.language_code
+        if target_lang and "-" not in target_lang:
+            lang_map = {
+                "en": "en-IN",
+                "hi": "hi-IN",
+                "mr": "mr-IN",
+                "bn": "bn-IN",
+                "ta": "ta-IN",
+                "te": "te-IN",
+                "gu": "gu-IN",
+                "kn": "kn-IN",
+                "ml": "ml-IN",
+                "pa": "pa-IN",
+                "od": "od-IN",
+            }
+            target_lang = lang_map.get(target_lang.lower(), f"{target_lang}-IN")
+
         target_model = model or self.model
         if not target_model or target_model in ("saaras:v2", "default"):
             target_model = "saaras:v1"
@@ -86,7 +102,9 @@ class SarvamSTTService:
         }
         content_type = "audio/wav"
         fn_lower = filename.lower()
-        if fn_lower.endswith(".webm") or audio_bytes.startswith(b"\x1a\x45\xdf\xa3"):
+        if audio_bytes.startswith(b"RIFF") or fn_lower.endswith(".wav"):
+            content_type = "audio/wav"
+        elif fn_lower.endswith(".webm") or audio_bytes.startswith(b"\x1a\x45\xdf\xa3"):
             content_type = "audio/webm"
         elif fn_lower.endswith(".mp3") or audio_bytes.startswith(b"ID3") or audio_bytes.startswith(b"\xff\xfb"):
             content_type = "audio/mpeg"
@@ -97,10 +115,10 @@ class SarvamSTTService:
             "file": (filename, audio_bytes, content_type),
         }
         data = {
-            "language_code": target_lang,
             "model": target_model,
-            "with_diarization": "false",
         }
+        if target_lang and target_lang != "unknown":
+            data["language_code"] = target_lang
 
         t0 = time.perf_counter()
         try:
