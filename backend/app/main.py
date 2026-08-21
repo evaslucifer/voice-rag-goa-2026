@@ -179,6 +179,15 @@ def create_application() -> FastAPI:
     # 4. Register API routes
     app.include_router(api_router)
 
+    @app.get("/")
+    async def root():
+        return {
+            "name": "Voice-Enabled Multilingual RAG API",
+            "status": "online",
+            "docs": "/docs",
+            "health": "/api/health",
+        }
+
     return app
 
 
