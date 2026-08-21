@@ -32,7 +32,7 @@ COPY qdrant_storage ./qdrant_storage
 COPY backend/.env.example ./.env.example
 
 RUN mkdir -p /opt/fastembed_cache && \
-    python -c "from fastembed import TextEmbedding; TextEmbedding(model_name='sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2', threads=1)" && \
+    python -c "from fastembed import TextEmbedding; TextEmbedding(model_name='BAAI/bge-small-en-v1.5', threads=1); TextEmbedding(model_name='sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2', threads=1)" && \
     chown -R appuser:appuser /app /opt/fastembed_cache
 
 USER appuser
