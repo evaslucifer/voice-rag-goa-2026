@@ -57,8 +57,8 @@ def create_application() -> FastAPI:
         title="Voice-Enabled Multilingual RAG API",
         description="Sub-200ms Voice-Enabled Multilingual Retrieval-Augmented Generation API using MSMARCO-XI, Sarvam STT, FastEmbed BGE-Small, Qdrant, and Groq.",
         version="0.1.0",
-        docs_url="/docs" if not settings.is_production else None,
-        redoc_url="/redoc" if not settings.is_production else None,
+        docs_url="/docs",
+        redoc_url="/redoc",
         lifespan=lifespan,
     )
 

@@ -5,14 +5,21 @@ const API_BASE_URL =
   import.meta.env.VITE_API_URL ||
   (import.meta.env.PROD ? DEFAULT_PRODUCTION_BACKEND : "");
 
-export async function checkBackendHealth() {
-  const response = await fetch(`${API_BASE_URL}/api/health`);
-
-  if (!response.ok) {
-    throw new Error(`Backend health check failed: ${response.status}`);
+export async function checkBackendHealth(retries = 2, delayMs = 2500) {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/health`);
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch (err) {
+      if (attempt === retries) throw err;
+    }
+    if (attempt < retries) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
   }
-
-  return response.json();
+  throw new Error("Backend health check failed after retries.");
 }
 export async function sendTextQuery(query, language = "en") {
   const response = await fetch(`${API_BASE_URL}/api/query`, {
