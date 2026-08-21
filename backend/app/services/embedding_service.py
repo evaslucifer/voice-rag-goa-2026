@@ -75,11 +75,14 @@ class EmbeddingService:
                 "No embedding was generated for the query."
             )
 
-        return (
+        res = (
             embeddings[0].tolist()
             if hasattr(embeddings[0], "tolist")
             else list(embeddings[0])
         )
+        import gc
+        gc.collect()
+        return res
 
     def _sync_embed_documents(
         self,
