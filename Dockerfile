@@ -30,7 +30,7 @@ COPY qdrant_storage ./qdrant_storage
 
 COPY backend/.env.example ./.env.example
 
-RUN chown -R appuser:appuser /app /opt/fastembed_cache
+RUN mkdir -p /opt/fastembed_cache && chown -R appuser:appuser /app /opt/fastembed_cache
 
 USER appuser
 
