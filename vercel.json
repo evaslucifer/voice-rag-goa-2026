@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://voice-rag-goa-2026-jhpr.onrender.com/api/:path*"
+      "destination": "https://voice-rag-goa-2026.onrender.com/api/:path*"
     }
   ]
 }
