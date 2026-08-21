@@ -82,8 +82,17 @@ class SarvamSTTService:
         headers = {
             "api-subscription-key": self.api_key,
         }
+        content_type = "audio/wav"
+        fn_lower = filename.lower()
+        if fn_lower.endswith(".webm") or audio_bytes.startswith(b"\x1a\x45\xdf\xa3"):
+            content_type = "audio/webm"
+        elif fn_lower.endswith(".mp3") or audio_bytes.startswith(b"ID3") or audio_bytes.startswith(b"\xff\xfb"):
+            content_type = "audio/mpeg"
+        elif fn_lower.endswith(".ogg") or audio_bytes.startswith(b"OggS"):
+            content_type = "audio/ogg"
+
         files = {
-            "file": (filename, audio_bytes, "audio/wav"),
+            "file": (filename, audio_bytes, content_type),
         }
         data = {
             "language_code": target_lang,

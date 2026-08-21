@@ -117,7 +117,7 @@ async def process_voice_query(
         raise HTTPException(status_code=status.HTTP_504_GATEWAY_TIMEOUT, detail=str(e))
     except STTServiceError as e:
         logger.error("STT Service Error: %s", str(e), extra={"request_id": request_id})
-        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
 
 
 @router.websocket("/ws")
